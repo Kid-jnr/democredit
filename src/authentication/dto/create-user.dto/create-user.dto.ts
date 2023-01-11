@@ -1,5 +1,5 @@
 import { Transform, TransformFnParams } from 'class-transformer';
-import { IsString, IsEmail, Length, MinLength, IsStrongPassword, Equals } from 'class-validator';
+import { IsString, IsEmail, MinLength, IsStrongPassword } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()

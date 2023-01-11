@@ -11,6 +11,7 @@ exports.up = function(knex) {
     table.foreign('receiver_id').references('id').inTable('users').onDelete("SET NULL")
     table.enu('type',['DEPOSIT', 'WITHDRAWAL']).notNullable
     table.decimal('amount').notNullable
+    table.string('ref').notNullable
     table.timestamps(false, true)
   })
 

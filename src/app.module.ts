@@ -7,12 +7,13 @@ import { UsersService } from './users/users.service';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { ConfigModule } from '@nestjs/config';
 import { KnexModule } from './knex/knex.module';
+import { TransactionsService } from './transactions/transactions.service';
 
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal: true
   }),AuthenticationModule, KnexModule],
   controllers: [AppController, UsersController, TransactionsController],
-  providers: [AppService, UsersService],
+  providers: [AppService, UsersService, TransactionsService],
 })
 export class AppModule {}
