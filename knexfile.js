@@ -23,13 +23,7 @@ module.exports = {
  
   production: {
     client: 'mysql',
-    connection: {
-      host : 'localhost',
-      port : 3306,
-      database: 'democredit',
-      user:     'root',
-      password: ''
-    },
+    connection: process.env.CLEARDB_BLUE_URL,
     useNullAsDefault: true,
     pool: {
       min: 0,

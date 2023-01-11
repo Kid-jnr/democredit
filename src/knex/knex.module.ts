@@ -6,14 +6,14 @@ import  * as Knex from 'knex';
   providers: [{
     provide: 'KnexConnection',
     useFactory:async () => {
-      const knex = Knex.default(require('../../knexfile').development)
+      const knex = process.env.PRODUCTION ? Knex.default(require('../../knexfile').production) :Knex.default(require('../../knexfile').development)
       return knex
     }
   }],
   exports: [{
     provide: 'KnexConnection',
     useFactory:async () => {
-      const knex = Knex.default(require('../../knexfile').development)
+      const knex = process.env.PRODUCTION ? Knex.default(require('../../knexfile').production) :Knex.default(require('../../knexfile').development)
       return knex
     }
   }]
