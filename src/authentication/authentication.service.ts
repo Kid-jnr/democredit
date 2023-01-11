@@ -7,51 +7,77 @@ import { LoginUserDto } from './dto/login-user.dto/login-user.dto';
 
 @Injectable()
 export class AuthenticationService {
-    constructor( @Inject('KnexConnection') private readonly knex, private jwt: JwtService, private config: ConfigService){}
-    
-    private saltOrRounds = 10;
-    
+  constructor(
+    @Inject('KnexConnection') private readonly knex,
+    private jwt: JwtService,
+    private config: ConfigService,
+  ) {}
 
-    async registerUser(createUserDto: CreateUserDto){
+  private saltOrRounds = 10;
 
-        try {
-            const user = await this.knex('users').insert({
-                name: createUserDto.name,
-                email: createUserDto.email,
-                password: await bcrypt.hash(createUserDto.password,this.saltOrRounds),
-                balance: 0
-            })
+  async registerUser(createUserDto: CreateUserDto) {
+    try {
+      const payload = await this.knex('users').insert({
+        name: createUserDto.name,
+        email: createUserDto.email,
+        password: await bcrypt.hash(createUserDto.password, this.saltOrRounds),
+        balance: 0,
+      });
 
-            return {token: await this.signToken(user.id,user.email),message: 'Account created successfully', code: HttpStatus.CREATED}
-        } catch (error) {
-            throw new HttpException({message: error.sqlMessage}, HttpStatus.FORBIDDEN);
-        }
-        
+      const user = await this.knex('users')
+        .column('id', 'name', 'email', 'balance', 'created_at', 'updated_at')
+        .where({ id: payload[0] })
+        .first();
+
+      return {
+        user: user,
+        message: 'Account created successfully',
+        code: HttpStatus.CREATED,
+      };
+    } catch (error) {
+      throw new HttpException(
+        { message: error.sqlMessage, code: HttpStatus.FORBIDDEN },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
+  async loginUser(loginUserDto: LoginUserDto) {
+    let user = await this.knex('users')
+      .where({ email: loginUserDto.email })
+      .first();
+
+    if (!user) {
+      throw new HttpException(
+        { message: 'User does not exist', code: HttpStatus.NOT_FOUND },
+        HttpStatus.NOT_FOUND,
+      );
     }
 
-    async loginUser(loginUserDto: LoginUserDto ){
-        const user = await this.knex('users').where({email: loginUserDto.email}).first()
-
-        if(!user){
-            throw new HttpException({message: "User does not exist"}, HttpStatus.NOT_FOUND)
-        }
-
-        if( !(await bcrypt.compare(loginUserDto.password, user.password))){
-            throw new HttpException({message: "Wrong password"}, HttpStatus.BAD_REQUEST)
-        }
-
-        return {token: await this.signToken(user.id,user.email)}
+    if (!(await bcrypt.compare(loginUserDto.password, user.password))) {
+      throw new HttpException(
+        { message: 'Wrong password', code: HttpStatus.BAD_REQUEST },
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
-    signToken(userId: number, email: string): Promise<string>{
-        const payload ={
-            sub: userId,
-            email
-        }
-        
-        return this.jwt.signAsync(payload, {
-            expiresIn: '1h',
-            secret: this.config.get('JWT_SECRET')
-        })
-    }
+    user = await this.knex('users')
+      .column('id', 'name', 'email', 'balance', 'created_at', 'updated_at')
+      .where({ email: loginUserDto.email })
+      .first();
+
+    return { user: user, token: await this.signToken(user.id, user.email) };
+  }
+
+  signToken(userId: number, email: string): Promise<string> {
+    const payload = {
+      sub: userId,
+      email,
+    };
+
+    return this.jwt.signAsync(payload, {
+      expiresIn: '10h',
+      secret: this.config.get('JWT_SECRET'),
+    });
+  }
 }

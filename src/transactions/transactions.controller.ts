@@ -2,6 +2,7 @@ import { Body, Controller, Post, UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport/dist';
 import { Request } from 'express';
 import { CreateDepositDto } from './dto/create-deposit.dto/create-deposit.dto';
+import { CreateTransferDto } from './dto/create-transfer.dto/create-transfer.dto';
 import { CreateWithdrawalDto } from './dto/create-withdrawal.dto/create-withdrawal.dto';
 import { TransactionsService } from './transactions.service';
 
@@ -12,7 +13,7 @@ export class TransactionsController {
 
     @Post('deposit')
     deposit(@Body() createDepositDto: CreateDepositDto,@Req() req: Request ){
-        return this.transactionService.createDeposit(createDepositDto,req.user)
+        return this.transactionService.createDeposit(createDepositDto,req.user,null)
     }
 
     @Post('withdrawal')
@@ -21,7 +22,7 @@ export class TransactionsController {
     }
 
     @Post('transfer')
-    transfer(){
-        return "transfer"
+    transfer(@Body() createTransferDto: CreateTransferDto, @Req() req: Request){
+        return this.transactionService.createTransfer(createTransferDto, req.user)
     }
 }
