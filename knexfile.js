@@ -6,12 +6,15 @@
 module.exports = {
 
   development: {
-    client: 'postgresql',
+    client: 'mysql',
     connection: {
+      host : 'localhost',
+      port : 3306,
       database: 'democredit',
-      user:     'postgres',
-      password: 'password'
+      user:     'root',
+      password: ''
     },
+    useNullAsDefault: true,
     migrations: {
       directory: './migrations/users'
     },
@@ -19,14 +22,17 @@ module.exports = {
 
  
   production: {
-    client: 'postgresql',
+    client: 'mysql',
     connection: {
+      host : 'localhost',
+      port : 3306,
       database: 'democredit',
-      user:     'pass',
-      password: 'password'
+      user:     'root',
+      password: ''
     },
+    useNullAsDefault: true,
     pool: {
-      min: 2,
+      min: 0,
       max: 10
     },
     migrations: {

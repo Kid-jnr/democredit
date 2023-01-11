@@ -3,11 +3,16 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersController } from './users/users.controller';
 import { TransactionsController } from './transactions/transactions.controller';
-import { AuthenticationController } from './authentication/authentication.controller';
+import { UsersService } from './users/users.service';
+import { AuthenticationModule } from './authentication/authentication.module';
+import { ConfigModule } from '@nestjs/config';
+import { KnexModule } from './knex/knex.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController, UsersController, TransactionsController, AuthenticationController],
-  providers: [AppService],
+  imports: [ConfigModule.forRoot({
+    isGlobal: true
+  }),AuthenticationModule, KnexModule],
+  controllers: [AppController, UsersController, TransactionsController],
+  providers: [AppService, UsersService],
 })
 export class AppModule {}
